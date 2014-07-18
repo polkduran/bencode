@@ -8,28 +8,48 @@ type BenElement =
 
 let toString chars = System.String(chars |> Array.ofSeq)
 
-let chars = "i456789e" |> List.ofSeq
-let rec iss acc = function
-                    | v::['e'] -> Some(v::acc)
-                    | v::r -> iss (v::acc) r   
-                    | _ -> None  
-let i = chars 
-            |> function 'i'::r -> Some(r) | _ -> None
-            |> Option.bind (iss [] )
-
-let (|BenInt|_|) = 
-    let rec loop acc = function
-        | 'i'::rest -> loop [] rest
-        | 'e'::[] -> Some(acc |> List.rev |> toString |> int64)
-        | c::rest ->  loop (c::acc) rest
+let (|BenInt|_|) chars = 
+    let toBenInt = List.rev >> toString >> int64 >> Int
+    let rec parseInt acc = function
+        | i::'e'::tail -> Some(toBenInt (i::acc),tail)
+        | v::tail -> parseInt (v::acc) tail
         | _ -> None
-    loop [] 
+    chars 
+        |> function 'i'::r -> Some(r) |_->None
+        |> Option.bind (parseInt [])
+        
+let (|BenString|_|) chars =
+    let toBenString = List.rev >> toString >> String
+    let rec parseString acc n = function
+        | s::tail when n > 0 -> parseString  (s::acc) (n-1) tail
+        | _ when n > 0 -> None
+        | rest -> Some(toBenString acc, rest)
+    chars
+        |> function n::':'::r -> Some(n.ToString() |> int,r) |_->None
+        |> Option.bind (fun (n,r) -> parseString [] n r)
 
-let (|BenString|_|) =
-    let rec loop acc = function
-        |
+let rec (|BenList|_|) chars =
+    let toBenList = List.rev >> List
+    let rec parseList acc = function
+        |BenEl(x,tail) -> parseList (x::acc) tail
+        |'e'::tail -> Some(toBenList acc, tail)
+        |_ -> None
+    chars
+        |> function 'l'::r -> Some(r) |_-> None
+        |> Option.bind (parseList [])
+
+and (|BenEl|_|) = function
+    | BenInt(x,tail) 
+    | BenString(x,tail)
+    | BenList(x,tail) -> Some(x,tail)
+    | _ -> None
 
 
-let (BenInt i) = chars
+let f chars = 
+    match chars with
+    |BenEl(x,tail) -> (Some(x),tail)
+    |c -> (None,c)
 
-let parse input =
+let chars = "l4:spami456elee" |> List.ofSeq
+let res = f chars
+
