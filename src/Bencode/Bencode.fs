@@ -15,37 +15,32 @@ let (|Num|_|) (c:char) = match Int32.TryParse(c.ToString()) with
 
 let toInt = List.rev >> toString >> int64
 
-
-let (|Nums|_|) suffix chars =
-    let rec parseInternal acc = function
-        |Num(c)::tail -> parseInternal (c::acc) tail
-        |suffix::tail -> Some(toInt acc, tail)
-        |_ -> None
-    parseInternal [] chars
+let parseInt prefix chars = 
+    let (|Nums|_|) suffix chars =
+        let rec parseInternal acc = function
+            |Num(c)::tail -> parseInternal (c::acc) tail
+            |suffix::tail -> Some(toInt acc, tail)
+            |_ -> None
+        parseInternal [] chars
+    match chars with
+    | Nums prefix (i, tail) -> Some(i,tail)
+    | _ ->None
 
 let (|BenInt|_|) chars = 
-    let toBenInt = toInt >> Int
-    let rec parseInt acc = function
-        | i::'e'::tail -> Some(toBenInt (i::acc),tail)
-        | v::tail -> parseInt (v::acc) tail
-        | _ -> None
     chars 
         |> function 'i'::r -> Some(r) |_->None
-        |> Option.bind (function Nums(i,tail) 'e' -> Some(Int(i),tail)|_-> None )
+        |> Option.bind (parseInt 'e')
+        |> Option.map (fun (i,tail) -> Some(Int(i), tail)
         
 let (|BenString|_|) chars =
     let toBenString = List.rev >> toString >> String
-    let rec strLen acc = function
-            | Num(i)::r -> strLen (i::acc) r
-            | ':'::r -> Some(toInt acc)
-            |_ -> None 
     let rec parseString acc n = function
-        | s::tail when n > 0 -> parseString  (s::acc) (n-1) tail
-        | _ when n > 0 -> None
+        | s::tail when n > 0L -> parseString  (s::acc) (n-1L) tail
+        | _ when n > 0L -> None
         | rest -> Some(toBenString acc, rest)
-    chars
-        |> function n::':'::r -> Some(n.ToString() |> int,r) |_->None
-        |> Option.bind (fun (n,r) -> parseString [] n r)
+    parseInt ':' chars
+//        |> function n::':'::r -> Some(n.ToString() |> int,r) |_->None
+//        |> Option.bind (fun (n,r) -> parseString [] n r)
 
 let rec (|BenList|_|) chars =
     let toBenList = List.rev >> List
