@@ -9,28 +9,22 @@ type BenElement =
 
 let toString chars = System.String(chars |> Array.ofSeq)
 
-let (|Num|_|) (c:char) = match Int32.TryParse(c.ToString()) with
-                            | true,_ -> Some(c)
-                            | _ -> None
+let (|Num|_|) (c:char) = 
+    let intVal = int c
+    if intVal > 47 && intVal < 58 then Some(c) else None
 
-let toInt = List.rev >> toString >> (fun s -> printfn "bla %s" s; s) >> int64
+let toInt = List.rev >> toString >> int64
 
-let parseInt suffix chars = 
-    let (|Nums|_|) chars =
-        let rec parseInternal acc = function
+let (|Nums|_|) suffix chars = 
+    let rec parseInternal acc = function
             |Num(c)::s::tail when s = suffix -> Some(toInt (c::acc), tail)
             |Num(c)::tail -> parseInternal (c::acc) tail
             |_ -> None
-        parseInternal [] chars
-    match chars with
-    | Nums (i, tail) -> Some(i,tail)
-    | _ ->None
+    parseInternal [] chars 
 
-let (|BenInt|_|) chars = 
-    chars 
-        |> function 'i'::r -> Some(r) |_->None
-        |> Option.bind (parseInt 'e')
-        |> Option.map (fun (i,tail) -> Int(i), tail)
+let (|BenInt|_|) = function
+    |'i'::Nums 'e' (i, tail) -> Some(Int(i),tail)
+    |_ -> None
         
 let (|BenString|_|) chars =
     let toBenString = List.rev >> toString >> String
@@ -39,9 +33,9 @@ let (|BenString|_|) chars =
         | n,_ when n > 0L -> None
         | _,rest -> Some(toBenString acc, rest)
     chars 
-        |> parseInt ':'
+        |> function Nums ':' (i,tail) -> Some(i,tail)|_->None
         |> Option.bind (parseString [])
-
+ 
 let rec (|BenList|_|) chars =
     let toBenList = List.rev >> List
     let rec parseList acc = function
@@ -62,8 +56,7 @@ and (|BenEl|_|) = function
 and (|BenDic|_|) chars =
     let buildMap kvs = Dict( new Map<string,BenElement>(kvs) )
     let rec parseKv acc = function
-        | BenString(String(k), BenEl(v,tail)) 
-                -> parseKv ((k,v)::acc) tail
+        | BenString(String(k), BenEl(v,tail)) -> parseKv ((k,v)::acc) tail
         | 'e'::tail -> Some(buildMap acc, tail)
         | _ -> None
     chars
