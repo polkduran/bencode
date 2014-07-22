@@ -15,11 +15,11 @@ let (|Num|_|) (c:char) = match Int32.TryParse(c.ToString()) with
 
 let toInt = List.rev >> toString >> (fun s -> printfn "bla %s" s; s) >> int64
 
-let parseInt (suffix:char) chars = 
+let parseInt suffix chars = 
     let (|Nums|_|) chars =
         let rec parseInternal acc = function
+            |Num(c)::s::tail when s = suffix -> Some(toInt (c::acc), tail)
             |Num(c)::tail -> parseInternal (c::acc) tail
-            |suffix::tail -> Some(toInt acc, tail)
             |_ -> None
         parseInternal [] chars
     match chars with
@@ -54,9 +54,9 @@ let rec (|BenList|_|) chars =
 
 and (|BenEl|_|) = function
     | BenInt(x,tail) 
-    | BenString(x,tail)
     | BenList(x,tail) 
-    | BenDic(x, tail) -> Some(x,tail)
+    | BenDic(x, tail)
+    | BenString(x,tail) -> Some(x,tail)
     | _ -> None
 
 and (|BenDic|_|) chars =
@@ -70,15 +70,4 @@ and (|BenDic|_|) chars =
         |> function 'd'::r -> Some(r) |_-> None
         |> Option.bind (parseKv [])
 
-let f chars = 
-    match chars with
-    |BenEl(x,tail) -> (Some(x),tail)
-    |c -> (None,c)
-
-let mutable str = "l9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee"
-//str<-"l17:publisher-webpagee"
-//str<-"d9:publisherle4:spami456ee"
-let chars = str |> List.ofSeq
-
-let res = f chars
 

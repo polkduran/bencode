@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bencode", "Bencode\Bencode.fsproj", "{EE980068-99CB-4266-8149-BF02E49CE296}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bencode.Test", "Bencode.Test\Bencode.Test.fsproj", "{A0AC14B6-C39D-46AC-8B73-6F73A2B67F36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{EE980068-99CB-4266-8149-BF02E49CE296}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE980068-99CB-4266-8149-BF02E49CE296}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE980068-99CB-4266-8149-BF02E49CE296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0AC14B6-C39D-46AC-8B73-6F73A2B67F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0AC14B6-C39D-46AC-8B73-6F73A2B67F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0AC14B6-C39D-46AC-8B73-6F73A2B67F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0AC14B6-C39D-46AC-8B73-6F73A2B67F36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
