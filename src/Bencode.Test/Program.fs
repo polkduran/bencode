@@ -1,25 +1,13 @@
 ﻿open System
 [<EntryPoint>]
 let main argv = 
-    let f chars = 
-        match chars with
-        |Bencode.BenEl(x,tail) -> (Some(x),tail)
-        |c -> (None,c)
 
-//    let nums = ["0e";"1e";"32e";"-256e";"-012e";"-0e";"45ie"]
-//    let r = nums 
-//            |> List.map List.ofSeq
-//            |> List.map (Bencode.tryGetNums 'e')
-//
-//    
-//    printfn "%A" r
-
-    let mutable str = "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee"
+    let mutable str = "d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homeeee"
     //str<-"17:publisher-webpage"
     //str<-"d9:publisherle4:spami456ee"
     let chars = str |> List.ofSeq
 
-    let res = f chars
+    let res = Bencode.BenDecode.parseChars chars
 
     printfn "%A" res
 
